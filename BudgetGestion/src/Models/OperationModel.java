@@ -165,6 +165,50 @@ public class OperationModel {
         return operation;
     }
     
+    
+    
+    public Operation getOperationByUser(int id){
+        String query = "SELECT * FROM " + TABLE_NAME +" WHERE " + USER_ID_FIELD +" = " +id;
+        int id_user;
+        String categorie, description, dateString;
+        double montant;
+        
+        Operation operation = null;
+        
+        this.connexion =  Database.getInstance().getConnection();
+    
+        try {
+            Statement statement = this.connexion.createStatement();
+            ResultSet resultSet = statement.executeQuery(query);
+            operation = new Operation();
+            while (resultSet.next()) {                
+                id = resultSet.getInt(DEPENSE_ID_FIELD);
+                categorie = resultSet.getString(CATEGORIE_FIELD);
+                description = resultSet.getString(DESCRIPTION_FIELD);
+                montant = resultSet.getDouble(MONTANT_FIELD);
+                id_user = resultSet.getInt(USER_ID_FIELD);
+                dateString = resultSet.getString(DATE_FIELD);
+                
+                operation.setId(id);
+                operation.setCategorie(categorie);
+                operation.setDescription(description);
+                operation.setMontant(montant);
+                operation.setDate(Utils.getDateFromString(dateString));
+            }
+            
+            statement.close();
+            connexion.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return operation;
+    }
+    
+    
+    
+    
+    
+    
     /*
     **  Suppression d'une operatiob
     **

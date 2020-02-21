@@ -11,7 +11,9 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="lib" path="C:/Users/e1402014/Downloads/AbsoluteLayout-RELEASE112.jar"/>
-	<classpathentry kind="lib" path="C:/Users/e1402014/Downloads/mysql-connector-java-5.1.48.jar"/>
+	<classpathentry kind="lib" path="jgoodies-forms-1.8.0.jar" sourcepath="jgoodies-forms-1.8.0-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Users/e1402014/Downloads/projet_methode.zip"/>
+	<classpathentry kind="lib" path="U:/Agile/mysql-connector-java-5.1.48.jar"/>
+	<classpathentry kind="lib" path="U:/Agile/AbsoluteLayout-RELEASE112.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

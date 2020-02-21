@@ -73,7 +73,7 @@ public class Login extends JFrame  {
         	}
         });
         tf_inscription = new javax.swing.JTextField();
-        label_prenom = new javax.swing.JLabel();
+        lblMotDePasse = new javax.swing.JLabel();
         label_nom = new javax.swing.JLabel();
 
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -114,9 +114,9 @@ public class Login extends JFrame  {
         });
         getContentPane().add(tf_inscription, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 230, -1, -1));
 
-        label_prenom.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-        label_prenom.setText("Prénom :");
-        getContentPane().add(label_prenom, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 160, -1, -1));
+        lblMotDePasse.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        lblMotDePasse.setText("Mdp  :");
+        getContentPane().add(lblMotDePasse, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 160, -1, -1));
 
         label_nom.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         label_nom.setText("Nom :");
@@ -145,7 +145,7 @@ public class Login extends JFrame  {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JLabel label_nom;
-    private javax.swing.JLabel label_prenom;
+    private javax.swing.JLabel lblMotDePasse;
     private javax.swing.JTextField tf_inscription;
     private javax.swing.JTextPane tp_login;
     private javax.swing.JTextPane tp_mdp;
