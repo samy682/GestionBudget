@@ -16,6 +16,7 @@ import java.sql.Statement;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
@@ -271,4 +272,311 @@ public class OperationModel {
         }
         return response;
     }
+	
+	
+	
+    public String[] getResultFromQueryCategories(String query) {
+        ArrayList<String> categories = new ArrayList<>();   
+        categories.add("Toute catégorie");
+        this.connexion =  Database.getInstance().getConnection();
+        
+        try {
+            Statement statement = this.connexion.createStatement();
+            ResultSet resultSet = statement.executeQuery(query);
+            while (resultSet.next()) {                
+                categories.add(resultSet.getString(CATEGORIE_FIELD));
+            }
+            
+            statement.close();
+            connexion.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        String str[] = new String[categories.size()]; 
+        
+        for (int j = 0; j < categories.size(); j++) { 
+  
+            // Assign each value to String array 
+            str[j] = categories.get(j); 
+        } 
+        
+        return str;
+    }
+    
+    public String[] toutesLesCategorieDuUser(int iduser) {
+        String query = "SELECT " + CATEGORIE_FIELD + " FROM " + TABLE_NAME +" WHERE " + USER_ID_FIELD + " = " + iduser + " GROUP BY " + CATEGORIE_FIELD;
+        return getResultFromQueryCategories(query);
+    }
+    
+    public String[] toutesLesCategorieRevenueDuUser(int iduser) {
+        String query = "SELECT " + CATEGORIE_FIELD + " FROM " + TABLE_NAME +" WHERE " + USER_ID_FIELD + " = " + iduser + " AND montant > 0 GROUP BY " + CATEGORIE_FIELD;
+        return getResultFromQueryCategories(query);
+    }
+    
+    public String[] toutesLesCategorieDepenseDuUser(int iduser) {
+        String query = "SELECT " + CATEGORIE_FIELD + " FROM " + TABLE_NAME +" WHERE " + USER_ID_FIELD + " = " + iduser + " AND montant < 0 GROUP BY " + CATEGORIE_FIELD;
+        return getResultFromQueryCategories(query);
+    }
+    
+    
+    public String[] toutesLesAnneeDuUser(int iduser) {
+        String query = "SELECT Year(date) as Annee FROM " + TABLE_NAME +" WHERE " + USER_ID_FIELD + " = " + iduser + " GROUP BY Annee ORDER BY Annee DESC";
+        ArrayList<String> annee = new ArrayList<>();        
+        this.connexion =  Database.getInstance().getConnection();
+        
+        try {
+            Statement statement = this.connexion.createStatement();
+            ResultSet resultSet = statement.executeQuery(query);
+            while (resultSet.next()) {                
+                annee.add(resultSet.getString("Annee"));
+            }
+            
+            statement.close();
+            connexion.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        String str[] = new String[annee.size()]; 
+        
+        for (int j = 0; j < annee.size(); j++) { 
+  
+            // Assign each value to String array 
+            str[j] = annee.get(j); 
+        } 
+        
+        return str;
+    }
+    
+    
+    private LinkedHashMap<Integer,Double> getResultFromQueryMonth(String query) {
+        LinkedHashMap<Integer,Double> moisSomme = new LinkedHashMap<>();        
+        this.connexion =  Database.getInstance().getConnection();
+        
+        try {
+            Statement statement = this.connexion.createStatement();
+            ResultSet resultSet = statement.executeQuery(query);
+            while (resultSet.next()) {                
+                moisSomme.put(resultSet.getInt("Mois"), resultSet.getDouble("Somme"));
+            }
+            
+            statement.close();
+            connexion.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }        
+        return moisSomme;
+    }
+    
+    public LinkedHashMap<Integer,Double> sommeMontantByMonthAndUser(String date, int iduser) {
+        String query = "SELECT SUM(montant) as Somme, Month(date) as Mois FROM " + TABLE_NAME +" WHERE " + USER_ID_FIELD + " = " + iduser + " AND Year(date) = " + date + " GROUP BY Mois ORDER BY Mois ASC";
+        return getResultFromQueryMonth(query);
+    }
+    
+    public LinkedHashMap<Integer,Double> sommeMontantRevenueByMonthAndUser(String date, int iduser) {
+        String query = "SELECT SUM(montant) as Somme, Month(date) as Mois FROM " + TABLE_NAME +" WHERE " + USER_ID_FIELD + " = " + iduser + " AND Year(date) = " + date + " AND montant > 0 GROUP BY Mois ORDER BY Mois ASC";
+        return getResultFromQueryMonth(query);
+    }
+    
+    public LinkedHashMap<Integer,Double> sommeMontantDepenseByMonthAndUser(String date, int iduser) {
+        String query = "SELECT ABS(SUM(montant)) as Somme, Month(date) as Mois FROM " + TABLE_NAME +" WHERE " + USER_ID_FIELD + " = " + iduser + " AND Year(date) = " + date + " AND montant < 0 GROUP BY Mois ORDER BY Mois ASC";       
+        return getResultFromQueryMonth(query);
+    }
+    
+    public LinkedHashMap<Integer,Double> sommeMontantByMonthAndCategorieAndUser(String date, String cat, int iduser) {
+        String query = "SELECT SUM(montant) as Somme, Month(date) as Mois FROM " + TABLE_NAME +" WHERE " + USER_ID_FIELD + " = " + iduser + " AND Year(date) = " + date + " AND categorie = \"" + cat + "\" GROUP BY Mois ORDER BY Mois ASC";
+        return getResultFromQueryMonth(query);
+    }
+    
+    public LinkedHashMap<Integer,Double> sommeMontantRevenueByMonthAndCategorieAndUser(String date, String cat, int iduser) {
+        String query = "SELECT SUM(montant) as Somme, Month(date) as Mois FROM " + TABLE_NAME +" WHERE " + USER_ID_FIELD + " = " + iduser + " AND Year(date) = " + date + " AND categorie = \"" + cat + "\" AND montant > 0 GROUP BY Mois ORDER BY Mois ASC";
+        return getResultFromQueryMonth(query);
+    }
+    
+    public LinkedHashMap<Integer,Double> sommeMontantDepenseByMonthAndCategorieAndUser(String date, String cat, int iduser) {
+        String query = "SELECT ABS(SUM(montant)) as Somme, Month(date) as Mois FROM " + TABLE_NAME +" WHERE " + USER_ID_FIELD + " = " + iduser + " AND Year(date) = " + date + " AND categorie = \"" + cat + "\" AND montant < 0 GROUP BY Mois ORDER BY Mois ASC";       
+        return getResultFromQueryMonth(query);
+    }
+    
+    
+    
+    private LinkedHashMap<Integer,Double> getResultFromQueryYear(String query){
+        LinkedHashMap<Integer,Double> anneeSomme = new LinkedHashMap<>();        
+        this.connexion =  Database.getInstance().getConnection();
+        
+        try {
+            Statement statement = this.connexion.createStatement();
+            ResultSet resultSet = statement.executeQuery(query);
+            while (resultSet.next()) {                
+                anneeSomme.put(resultSet.getInt("Annee"), resultSet.getDouble("Somme"));
+            }
+            
+            statement.close();
+            connexion.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }        
+        return anneeSomme;
+    }
+    
+    public LinkedHashMap<Integer,Double> sommeMontantByYearAndUser( int iduser) {
+        String query = "SELECT SUM(montant) as Somme, Year(date) as Annee FROM " + TABLE_NAME +" WHERE " + USER_ID_FIELD + " = " + iduser + " GROUP BY Annee ORDER BY Annee ASC";
+        return getResultFromQueryYear(query);
+    }
+    
+    public LinkedHashMap<Integer,Double> sommeMontantRevenueByYearAndUser( int iduser) {
+        String query = "SELECT SUM(montant) as Somme, Year(date) as Annee FROM " + TABLE_NAME +" WHERE " + USER_ID_FIELD + " = " + iduser + " AND montant > 0 GROUP BY Annee ORDER BY Annee ASC";
+        return getResultFromQueryYear(query);
+    }
+    
+    public LinkedHashMap<Integer,Double> sommeMontantDepenseByYearAndUser( int iduser) {
+        String query = "SELECT ABS(SUM(montant)) as Somme, Year(date) as Annee FROM " + TABLE_NAME +" WHERE " + USER_ID_FIELD + " = " + iduser + " AND montant < 0 GROUP BY Annee ORDER BY Annee ASC";
+        return getResultFromQueryYear(query);
+    }
+    
+    public LinkedHashMap<Integer,Double> sommeMontantByYearAndCategorieAndUser( String cat, int iduser) {
+        String query = "SELECT SUM(montant) as Somme, Year(date) as Annee FROM " + TABLE_NAME +" WHERE " + USER_ID_FIELD + " = " + iduser + "AND categorie = \"" + cat + "\" GROUP BY Annee ORDER BY Annee ASC";
+        return getResultFromQueryYear(query);
+    }
+    
+    public LinkedHashMap<Integer,Double> sommeMontantRevenueByYearAndCategorieAndUser( String cat, int iduser) {
+        String query = "SELECT SUM(montant) as Somme, Year(date) as Annee FROM " + TABLE_NAME +" WHERE " + USER_ID_FIELD + " = " + iduser + " AND categorie = \"" + cat + "\" AND montant > 0 GROUP BY Annee ORDER BY Annee ASC";
+        return getResultFromQueryYear(query);
+    }
+    
+    public LinkedHashMap<Integer,Double> sommeMontantDepenseByYearAndCategorieAndUser( String cat, int iduser) {
+        String query = "SELECT ABS(SUM(montant)) as Somme, Year(date) as Annee FROM " + TABLE_NAME +" WHERE " + USER_ID_FIELD + " = " + iduser + " AND categorie = \"" + cat + "\" AND montant < 0 GROUP BY Annee ORDER BY Annee ASC";
+        return getResultFromQueryYear(query);
+    }
+
+
+
+    private LinkedHashMap<Integer,Double> getResultFromQueryAverage(String query) {
+        LinkedHashMap<Integer,Double> moisMoyenne = new LinkedHashMap<>();        
+        this.connexion =  Database.getInstance().getConnection();
+        
+        try {
+            Statement statement = this.connexion.createStatement();
+            ResultSet resultSet = statement.executeQuery(query);
+            while (resultSet.next()) {                
+                moisMoyenne.put(resultSet.getInt("Mois"), resultSet.getDouble("Moyenne"));
+            }
+            
+            statement.close();
+            connexion.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }        
+        return moisMoyenne;
+    }
+    
+    public LinkedHashMap<Integer,Double> moyenneMontantByUser( int iduser) {
+        String query = "SELECT AVG(Somme) as Moyenne, Mois\n" +
+        "FROM ( SELECT SUM(montant) as Somme, Month(date) as Mois, Year(date) as Annee\n" +
+        "       FROM " + TABLE_NAME +"\n" +
+        "       WHERE " + USER_ID_FIELD + " = " + iduser + "\n" +
+        "       GROUP BY Mois, Annee\n" +
+        "       ORDER BY Mois ASC) as inner_query\n" +
+        "GROUP BY Mois ORDER BY Mois ASC";
+        return getResultFromQueryAverage(query);
+    }
+    
+    public LinkedHashMap<Integer,Double> moyenneMontantRevenueByUser( int iduser) {
+        String query = "SELECT AVG(Somme) as Moyenne, Mois\n" +
+        "FROM ( SELECT SUM(montant) as Somme, Month(date) as Mois, Year(date) as Annee\n" +
+        "       FROM " + TABLE_NAME +"\n" +
+        "       WHERE " + USER_ID_FIELD + " = " + iduser + " AND montant > 0\n" +
+        "       GROUP BY Mois, Annee\n" +
+        "       ORDER BY Mois ASC) as inner_query\n" +
+        "GROUP BY Mois ORDER BY Mois ASC";
+        return getResultFromQueryAverage(query);
+    }
+    
+    public LinkedHashMap<Integer,Double> moyenneMontantDepenseByUser( int iduser) {
+        String query = "SELECT ABS(AVG(Somme)) as Moyenne, Mois\n" +
+        "FROM ( SELECT SUM(montant) as Somme, Month(date) as Mois, Year(date) as Annee\n" +
+        "       FROM " + TABLE_NAME +"\n" +
+        "       WHERE " + USER_ID_FIELD + " = " + iduser + " AND montant < 0\n" +
+        "       GROUP BY Mois, Annee\n" +
+        "       ORDER BY Mois ASC) as inner_query\n" +
+        "GROUP BY Mois ORDER BY Mois ASC";
+        return getResultFromQueryAverage(query);
+    }
+    
+    public LinkedHashMap<Integer,Double> moyenneMontantByCategorieAndUser( String cat, int iduser) {
+        String query = "SELECT AVG(Somme) as Moyenne, Mois\n" +
+        "FROM ( SELECT SUM(montant) as Somme, Month(date) as Mois, Year(date) as Annee\n" +
+        "       FROM " + TABLE_NAME +"\n" +
+        "       WHERE " + USER_ID_FIELD + " = " + iduser + " AND categorie = \""+ cat +"\"\n" +
+        "       GROUP BY Mois, Annee\n" +
+        "       ORDER BY Mois ASC) as inner_query\n" +
+        "GROUP BY Mois ORDER BY Mois ASC";
+        return getResultFromQueryAverage(query);
+    }
+    
+    public LinkedHashMap<Integer,Double> moyenneMontantRevenueByCategorieAndUser( String cat, int iduser) {
+        String query = "SELECT AVG(Somme) as Moyenne, Mois\n" +
+        "FROM ( SELECT SUM(montant) as Somme, Month(date) as Mois, Year(date) as Annee\n" +
+        "       FROM " + TABLE_NAME +"\n" +
+        "       WHERE " + USER_ID_FIELD + " = " + iduser + " AND montant > 0 AND categorie = \""+ cat +"\"\n" +
+        "       GROUP BY Mois, Annee\n" +
+        "       ORDER BY Mois ASC) as inner_query\n" +
+        "GROUP BY Mois ORDER BY Mois ASC";
+        return getResultFromQueryAverage(query);
+    }
+    
+    public LinkedHashMap<Integer,Double> moyenneMontantDepenseByCategorieAndUser( String cat, int iduser) {
+        String query = "SELECT ABS(AVG(Somme)) as Moyenne, Mois\n" +
+        "FROM ( SELECT SUM(montant) as Somme, Month(date) as Mois, Year(date) as Annee\n" +
+        "       FROM " + TABLE_NAME +"\n" +
+        "       WHERE " + USER_ID_FIELD + " = " + iduser + " AND montant < 0 AND categorie = \""+ cat +"\"\n" +
+        "       GROUP BY Mois, Annee\n" +
+        "       ORDER BY Mois ASC) as inner_query\n" +
+        "GROUP BY Mois ORDER BY Mois ASC";
+        return getResultFromQueryAverage(query);
+    }
+    
+    
+    
+    
+    private LinkedHashMap<String,Double> getResultFromQueryPieCategories(String query) {
+        LinkedHashMap<String,Double> moisSomme = new LinkedHashMap<>();        
+        this.connexion =  Database.getInstance().getConnection();
+        
+        try {
+            Statement statement = this.connexion.createStatement();
+            ResultSet resultSet = statement.executeQuery(query);
+            while (resultSet.next()) {                
+                moisSomme.put(resultSet.getString("categorie"), resultSet.getDouble("Somme"));
+            }
+            
+            statement.close();
+            connexion.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }        
+        return moisSomme;
+    }
+    
+    public LinkedHashMap<String,Double> distributionMontantRevenueByUser(int iduser) {
+        String query = "SELECT SUM(montant) as Somme, categorie FROM " + TABLE_NAME +" WHERE " + USER_ID_FIELD + " = " + iduser + " AND  montant > 0 GROUP BY categorie ORDER BY Somme DESC";
+        return getResultFromQueryPieCategories(query);
+    }
+    
+    public LinkedHashMap<String,Double> distributionMontantDepenseByUser(int iduser) {
+        String query = "SELECT ABS(SUM(montant)) as Somme, categorie FROM " + TABLE_NAME +" WHERE " + USER_ID_FIELD + " = " + iduser + " AND  montant < 0 GROUP BY categorie ORDER BY Somme DESC";
+        return getResultFromQueryPieCategories(query);
+    }
+    
+    public LinkedHashMap<String,Double> distributionMontantRevenueByYearAndUser(String date, int iduser) {
+        String query = "SELECT SUM(montant) as Somme, categorie FROM " + TABLE_NAME +" WHERE " + USER_ID_FIELD + " = " + iduser + " AND  montant > 0 AND Year(date) = "+ date +" GROUP BY categorie ORDER BY Somme DESC";
+        return getResultFromQueryPieCategories(query);
+    }
+    
+    public LinkedHashMap<String,Double> distributionMontantDepenseByYearAndUser(String date, int iduser) {
+        String query = "SELECT ABS(SUM(montant)) as Somme, categorie FROM " + TABLE_NAME +" WHERE " + USER_ID_FIELD + " = " + iduser + " AND  montant < 0 AND Year(date) = "+ date +" GROUP BY categorie ORDER BY Somme DESC";
+        return getResultFromQueryPieCategories(query);
+    }
+    
 }
