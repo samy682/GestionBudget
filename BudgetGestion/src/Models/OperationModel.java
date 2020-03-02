@@ -578,5 +578,29 @@ public class OperationModel {
         String query = "SELECT ABS(SUM(montant)) as Somme, categorie FROM " + TABLE_NAME +" WHERE " + USER_ID_FIELD + " = " + iduser + " AND  montant < 0 AND Year(date) = "+ date +" GROUP BY categorie ORDER BY Somme DESC";
         return getResultFromQueryPieCategories(query);
     }
+	
+	
+	
+    
+    public ArrayList<Double> getAllYearByMonthByUser(int month,int iduser) {
+        String query = "SELECT ABS(SUM(montant)) as Somme, Year(date) as Annee FROM " + TABLE_NAME +" WHERE " + USER_ID_FIELD + " = " + iduser + " AND Month(date) = " + month + " AND montant < 0 GROUP BY Annee ORDER BY Annee ASC";
+        ArrayList<Double> moisSomme = new ArrayList<>();        
+        this.connexion =  Database.getInstance().getConnection();
+        
+        try {
+            Statement statement = this.connexion.createStatement();
+            ResultSet resultSet = statement.executeQuery(query);
+            while (resultSet.next()) {                
+                moisSomme.add(resultSet.getDouble("Somme"));
+            }
+            
+            statement.close();
+            connexion.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }        
+        return moisSomme;
+    }
+    
     
 }
