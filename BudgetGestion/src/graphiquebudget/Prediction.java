@@ -13,20 +13,25 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.category.DefaultCategoryDataset;
 
+import Utils.Session;
 
 public class Prediction extends JPanel{
 
+    private int iduser;
+	
     public Prediction() {
         super();
         setLayout(new BorderLayout());
         DefaultCategoryDataset  dataset = new DefaultCategoryDataset ();
+        Session sess = Session.getInstance();
+        iduser = sess.us.getId();
         OperationModel OM = new OperationModel();
         Date date = new Date();
         LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         int month = localDate.getMonthValue();
         LinkedHashMap<Integer,Double> prediction = new LinkedHashMap<>();
         for (int i = 0 ;i<12; i++) {
-            ArrayList<Double> arr = OM.getAllYearByMonthByUser(i+1,1);
+            ArrayList<Double> arr = OM.getAllYearByMonthByUser(i+1,iduser);
             if(arr.size() > 1 && (i != month-1 || arr.size() > 2)) {
                 if (i == month-1) {
                     arr.remove(arr.size()-1);
