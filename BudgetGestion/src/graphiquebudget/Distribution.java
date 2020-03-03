@@ -28,6 +28,7 @@ import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
+import Utils.Session;
 
 public class Distribution extends JPanel {
     
@@ -35,7 +36,8 @@ public class Distribution extends JPanel {
     private JComboBox periode;
     private JComboBox typeOperation;
     private ChartPanel graphique;
-    
+    private int iduser;
+	
     public final static int TO_REVENUE = 0;
     public final static int TO_DEPENSE = 1;
     
@@ -43,6 +45,9 @@ public class Distribution extends JPanel {
         super();
         setLayout(new BorderLayout());
         JPanel p = new JPanel(new FlowLayout());
+        
+        Session sess = Session.getInstance();
+        iduser = sess.us.getId();
         
         OperationModel OM = new OperationModel();
         
@@ -61,7 +66,7 @@ public class Distribution extends JPanel {
             }
         });
         
-        String[] per = OM.toutesLesAnneeDuUser(1);
+        String[] per = OM.toutesLesAnneeDuUser(iduser);
         periode = new JComboBox(per);
         
         String[] typ = {"Revenues", "Dépenses"};
@@ -108,11 +113,11 @@ public class Distribution extends JPanel {
         String serie,charte;
         switch (typeOperation) {
             case TO_DEPENSE:
-                data = OM.distributionMontantDepenseByYearAndUser(date,1);
+                data = OM.distributionMontantDepenseByYearAndUser(date,iduser);
                 charte = "Distribution des Dépenses de l'année " + date + " : ";
                 break;
             default:
-                data = OM.distributionMontantRevenueByYearAndUser(date,1);
+                data = OM.distributionMontantRevenueByYearAndUser(date,iduser);
                 charte = "Distribution des Revenues de l'année " + date + " : ";
                 break;
         }
@@ -145,11 +150,11 @@ public class Distribution extends JPanel {
         String serie,charte;
         switch (typeOperation) {
             case TO_DEPENSE:
-                data = OM.distributionMontantDepenseByUser(1);
+                data = OM.distributionMontantDepenseByUser(iduser);
                 charte = "Distribution des Dépenses : ";
                 break;
             default:
-                data = OM.distributionMontantRevenueByUser(1);
+                data = OM.distributionMontantRevenueByUser(iduser);
                 charte = "Distribution des Revenues : ";
                 break;
         }
@@ -178,3 +183,4 @@ public class Distribution extends JPanel {
     
     
 }
+
