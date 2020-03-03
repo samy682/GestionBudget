@@ -24,7 +24,6 @@ public class Prediction extends JPanel{
         Date date = new Date();
         LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         int month = localDate.getMonthValue();
-        int year = localDate.getYear();
         LinkedHashMap<Integer,Double> prediction = new LinkedHashMap<>();
         for (int i = 0 ;i<12; i++) {
             ArrayList<Double> arr = OM.getAllYearByMonthByUser(i+1,1);
