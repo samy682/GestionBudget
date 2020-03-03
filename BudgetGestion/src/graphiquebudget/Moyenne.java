@@ -19,12 +19,14 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
 
+import Utils.Session;
 
 public class Moyenne extends JPanel {
     
     private final JComboBox typeOperation;
     private JComboBox categories;
     private ChartPanel graphique;
+    private int iduser;
     
     public final static int TO_ALL = 0;
     public final static int TO_REVENUE = 1;
@@ -34,7 +36,8 @@ public class Moyenne extends JPanel {
         super();
         setLayout(new BorderLayout());
         JPanel p = new JPanel(new FlowLayout());
-        
+        Session sess = Session.getInstance();
+        iduser = sess.us.getId();
         OperationModel OM = new OperationModel();
         
         String[] typ = {"Toutes les opérations", "Revenues", "Dépenses"};
@@ -45,18 +48,18 @@ public class Moyenne extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 String[] cat;
                 if (typeOperation.getSelectedIndex() == 0) {
-                    cat = OM.toutesLesCategorieDuUser(1);
+                    cat = OM.toutesLesCategorieDuUser(iduser);
                 } else if (typeOperation.getSelectedIndex() == 1) {
-                    cat = OM.toutesLesCategorieRevenueDuUser(1);
+                    cat = OM.toutesLesCategorieRevenueDuUser(iduser);
                 } else {
-                    cat = OM.toutesLesCategorieDepenseDuUser(1);
+                    cat = OM.toutesLesCategorieDepenseDuUser(iduser);
                 }
                 DefaultComboBoxModel model = new DefaultComboBoxModel( cat );
                 categories.setModel(model);
             }
         });
         
-        String[] cat = OM.toutesLesCategorieDuUser(1);
+        String[] cat = OM.toutesLesCategorieDuUser(iduser);
         categories = new JComboBox(cat);
         
         JButton b = new JButton("Filtrer");
@@ -98,17 +101,17 @@ public class Moyenne extends JPanel {
         String serie,charte;
         switch (typeOperation) {
             case TO_REVENUE:
-                data = OM.moyenneMontantRevenueByUser(1);
+                data = OM.moyenneMontantRevenueByUser(iduser);
                 serie = "Moyenne par mois de tous les revenues";
                 charte = "Moyenne des Revenues";
                 break;
             case TO_DEPENSE:
-                data = OM.moyenneMontantDepenseByUser(1);
+                data = OM.moyenneMontantDepenseByUser(iduser);
                 serie = "Moyenne par mois de toutes les dépenses";
                 charte = "Moyenne des Dépenses";
                 break;
             default:
-                data = OM.moyenneMontantByUser(1);
+                data = OM.moyenneMontantByUser(iduser);
                 serie = "Moyenne par mois de toutes les opérations";
                 charte = "Moyenne des Opérations";
                 break;
@@ -135,17 +138,17 @@ public class Moyenne extends JPanel {
         String serie,charte;
         switch (typeOperation) {
             case TO_REVENUE:
-                data = OM.moyenneMontantRevenueByCategorieAndUser( cat, 1);
+                data = OM.moyenneMontantRevenueByCategorieAndUser( cat, iduser);
                 serie = "Moyenne par mois des revenues \""+ cat + "\"";
                 charte = "Moyenne des Revenues \""+ cat + "\"";
                 break;
             case TO_DEPENSE:
-                data = OM.moyenneMontantDepenseByCategorieAndUser( cat, 1);
+                data = OM.moyenneMontantDepenseByCategorieAndUser( cat, iduser);
                 serie = "Moyenne par mois des dépenses \""+ cat + "\"";
                 charte = "Moyenne des Dépenses \""+ cat + "\"";
                 break;
             default:
-                data = OM.moyenneMontantByCategorieAndUser( cat, 1);
+                data = OM.moyenneMontantByCategorieAndUser( cat, iduser);
                 serie = "Moyenne par mois des opérations \""+ cat + "\"";
                 charte = "Moyenne des Opérations \""+ cat + "\"";
                 break;
