@@ -19,6 +19,8 @@ import org.jfree.chart.JFreeChart;
 import models.OperationModel;
 import org.jfree.data.category.DefaultCategoryDataset;
 
+import Utils.Session;
+
 public class Graphique extends JPanel {
     
     private final JComboBox granularite;
@@ -26,6 +28,7 @@ public class Graphique extends JPanel {
     private final JComboBox typeOperation;
     private JComboBox categories;
     private ChartPanel graphique;
+    private int iduser;
     
     public final static int TO_ALL = 0;
     public final static int TO_REVENUE = 1;
@@ -36,6 +39,8 @@ public class Graphique extends JPanel {
         setLayout(new BorderLayout());
         JPanel p = new JPanel(new FlowLayout());
         
+        Session sess = Session.getInstance();
+        iduser = sess.us.getId();
         OperationModel OM = new OperationModel();
         
         String[] gra = {"Intégralité", "Annuelle"};
@@ -53,7 +58,7 @@ public class Graphique extends JPanel {
             }
         });
         
-        String[] per = OM.toutesLesAnneeDuUser(1);
+        String[] per = OM.toutesLesAnneeDuUser(iduser);
         periode = new JComboBox(per);
         
         String[] typ = {"Toutes les opérations", "Revenues", "Dépenses"};
@@ -64,18 +69,18 @@ public class Graphique extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 String[] cat;
                 if (typeOperation.getSelectedIndex() == 0) {
-                    cat = OM.toutesLesCategorieDuUser(1);
+                    cat = OM.toutesLesCategorieDuUser(iduser);
                 } else if (typeOperation.getSelectedIndex() == 1) {
-                    cat = OM.toutesLesCategorieRevenueDuUser(1);
+                    cat = OM.toutesLesCategorieRevenueDuUser(iduser);
                 } else {
-                    cat = OM.toutesLesCategorieDepenseDuUser(1);
+                    cat = OM.toutesLesCategorieDepenseDuUser(iduser);
                 }
                 DefaultComboBoxModel model = new DefaultComboBoxModel( cat );
                 categories.setModel(model);
             }
         });
         
-        String[] cat = OM.toutesLesCategorieDuUser(1);
+        String[] cat = OM.toutesLesCategorieDuUser(iduser);
         categories = new JComboBox(cat);
         
         JButton b = new JButton("Filtrer");
@@ -127,17 +132,17 @@ public class Graphique extends JPanel {
         String serie,charte;
         switch (typeOperation) {
             case TO_REVENUE:
-                data = OM.sommeMontantRevenueByMonthAndUser(date,1);
+                data = OM.sommeMontantRevenueByMonthAndUser(date,iduser);
                 serie = "Somme par mois de tous les revenues de l'année " + date;
                 charte = "Somme des Revenues";
                 break;
             case TO_DEPENSE:
-                data = OM.sommeMontantDepenseByMonthAndUser(date,1);
+                data = OM.sommeMontantDepenseByMonthAndUser(date,iduser);
                 serie = "Somme par mois de toutes les dépenses de l'année " + date;
                 charte = "Somme des Dépenses";
                 break;
             default:
-                data = OM.sommeMontantByMonthAndUser(date,1);
+                data = OM.sommeMontantByMonthAndUser(date,iduser);
                 serie = "Somme par mois de toutes les opérations de l'année " + date;
                 charte = "Somme des Opérations";
                 break;
@@ -164,17 +169,17 @@ public class Graphique extends JPanel {
         String serie,charte;
         switch (typeOperation) {
             case TO_REVENUE:
-                data = OM.sommeMontantRevenueByMonthAndCategorieAndUser(date, cat, 1);
+                data = OM.sommeMontantRevenueByMonthAndCategorieAndUser(date, cat, iduser);
                 serie = "Somme par mois des revenues \""+ cat + "\" de l'année " + date;
                 charte = "Somme des Revenues \""+ cat + "\"";
                 break;
             case TO_DEPENSE:
-                data = OM.sommeMontantDepenseByMonthAndCategorieAndUser(date, cat, 1);
+                data = OM.sommeMontantDepenseByMonthAndCategorieAndUser(date, cat, iduser);
                 serie = "Somme par mois des dépenses \""+ cat + "\" de l'année " + date;
                 charte = "Somme des Dépenses \""+ cat + "\"";
                 break;
             default:
-                data = OM.sommeMontantByMonthAndCategorieAndUser(date, cat, 1);
+                data = OM.sommeMontantByMonthAndCategorieAndUser(date, cat, iduser);
                 serie = "Somme par mois des opérations \""+ cat + "\" de l'année " + date;
                 charte = "Somme des Opérations \""+ cat + "\"";
                 break;
@@ -201,17 +206,17 @@ public class Graphique extends JPanel {
         String serie,charte;
         switch (typeOperation) {
             case TO_REVENUE:
-                data = OM.sommeMontantRevenueByYearAndUser(1);
+                data = OM.sommeMontantRevenueByYearAndUser(iduser);
                 serie = "Somme par année de tous les revenues";
                 charte = "Somme des Revenues";
                 break;
             case TO_DEPENSE:
-                data = OM.sommeMontantDepenseByYearAndUser(1);
+                data = OM.sommeMontantDepenseByYearAndUser(iduser);
                 serie = "Somme par année de toutes les dépenses";
                 charte = "Somme des Dépenses";
                 break;
             default:
-                data = OM.sommeMontantByYearAndUser(1);
+                data = OM.sommeMontantByYearAndUser(iduser);
                 serie = "Somme par année de toutes les opérations";
                 charte = "Somme des Opérations";
                 break;
@@ -237,17 +242,17 @@ public class Graphique extends JPanel {
         String serie,charte;
         switch (typeOperation) {
             case TO_REVENUE:
-                data = OM.sommeMontantRevenueByYearAndCategorieAndUser(cat, 1);
+                data = OM.sommeMontantRevenueByYearAndCategorieAndUser(cat, iduser);
                 serie = "Somme par année des revenues \""+ cat + "\"";
                 charte = "Somme des Revenues \""+ cat + "\"";
                 break;
             case TO_DEPENSE:
-                data = OM.sommeMontantDepenseByYearAndCategorieAndUser(cat, 1);
+                data = OM.sommeMontantDepenseByYearAndCategorieAndUser(cat, iduser);
                 serie = "Somme par année des dépenses \""+ cat + "\"";
                 charte = "Somme des Dépenses \""+ cat + "\"";
                 break;
             default:
-                data = OM.sommeMontantByYearAndCategorieAndUser(cat, 1);
+                data = OM.sommeMontantByYearAndCategorieAndUser(cat, iduser);
                 serie = "Somme par année des opérations \""+ cat + "\"";
                 charte = "Somme des Opérations \""+ cat + "\"";
                 break;
